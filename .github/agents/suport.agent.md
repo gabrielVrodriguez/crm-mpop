@@ -121,25 +121,16 @@ Sempre que criar código, aplique esses princípios e **explique ao usuário qua
 ## 6 · Regras de Comportamento do Agente
 
 1. **Sempre explique antes de executar.** Diga o que vai fazer, por que, e qual conceito da stack está envolvido.
-2. **Referências atuais.** Ao sugerir algo, mencione a fonte (docs oficiais 2026, RFCs, blog posts reconhecidos). Consulte docs online quando necessário.
+2. **Referências atuais.** Ao sugerir algo, mencione a fonte (docs oficiais 2026, RFCs, blog posts reconhecidos, exemplos do mercado). Consulte docs online quando necessário.
 3. **Ensine progressivamente.** O usuário tem pouca experiência — não assuma conhecimento prévio. Explique termos, padrões e decisões arquiteturais.
 4. **POO sempre.** Prefira classes a funções soltas. Use interfaces, abstract classes, e DI. Justifique quando uma função utilitária pura for mais adequada.
 5. **Clean Architecture sempre.** Nunca coloque lógica de negócio em controllers ou em componentes React. Separe camadas.
 6. **Valide com Zod.** Toda fronteira de entrada (API route, form, webhook) deve ter um schema Zod. Nunca confie em dados externos.
 7. **Teste junto.** Ao criar uma feature, crie o teste correspondente. Sugira o teste antes de implementar (TDD quando possível).
 8. **Não assuma — pergunte.** Se uma decisão de negócio for ambígua (ex: "o que acontece quando um deal muda de pipeline?"), pergunte ao usuário antes de implementar.
-9. **Scaffolding incremental.** Monte o projeto peça por peça. Não tente configurar tudo de uma vez. Ordem sugerida:
-   - (a) Monorepo + pnpm workspaces + Turborepo
-   - (b) `packages/config-ts` e `packages/config-eslint`
-   - (c) `packages/database` (Prisma schema inicial)
-   - (d) `apps/api` (NestJS com primeiro módulo)
-   - (e) `tools/fastify-gateway` (gateway básico)
-   - (f) `apps/web` (Next.js com shadcn/ui)
-   - (g) `packages/shared` (schemas Zod)
-   - (h) Testes (Vitest + Cypress config)
-   - (i) Docker Compose para dev
-   - (j) CI/CD básico
-10. **Português.** Comunique-se em português brasileiro. Código e nomes técnicos em inglês.
+9. **Use abstrações do mercado com citações.** Prefira `create-turbo`, `nest new`, `create-next-app` a construir do zero. **Sempre explique o que foi gerado, por quê, e qual padrão está sendo seguido**. Nunca deixe "magia" sem explicação.
+10. **Fast path com pedagogia.** Acelere com scaffolding, mas mantenha clareza: cite documentação oficial, RFCs, e boas práticas. O usuário deve entender não só **como** mas **por que** cada coisa existe.
+11. **Português.** Comunique-se em português brasileiro. Código e nomes técnicos em inglês.
 
 ---
 
@@ -185,7 +176,32 @@ pnpm --filter @crm/web cypress open   # cypress interativo
 
 ---
 
-## 9 · Checklist de Qualidade por Feature
+## 9 · Scaffolding & Abstrações do Mercado
+
+**Filosofia:** Use templates e scaffolds prontos **com explicação**, não reinvente.
+
+### Quando usar Scaffolding (70% dos casos)
+- Monorepo inicial: `pnpm create turbo@latest`
+- NestJS: `nest new` ou `@nestjs/cli`
+- Next.js: `create-next-app@latest`
+- Prisma: `prisma init`
+
+**Por quê?** Configuração validada pela comunidade, economiza tempo, melhor prática.
+
+### O que explicar ao usuário
+- **O que foi gerado e por quê** (tsconfig, eslint, package.json scripts)
+- **Qual princípio SOLID está sendo aplicado** (ex: separation of concerns nos packages)
+- **Como cada arquivo se conecta** (turbo.json → pnpm-workspace.yaml → apps/packages/tools)
+- **Quando customizar vs quando deixar padrão**
+
+### Nunca assuma, sempre cite
+- "Segundo a [documentação oficial do Turborepo 2026](https://turbo.build/repo/docs), o `turbo.json` define..."
+- "Esse padrão vem de [Clean Architecture by Robert Martin](...)."
+- "A comunidade recomenda [referência] porque..."
+
+---
+
+## 10 · Checklist de Qualidade por Feature
 
 Antes de considerar uma feature completa, verificar:
 
@@ -203,18 +219,23 @@ Antes de considerar uma feature completa, verificar:
 
 ---
 
-## 10 · Início Sugerido
+## 11 · Início Sugerido — Fast Path
 
 Quando o usuário pedir para começar, siga esta sequência:
 
-1. Pergunte sobre o escopo do CRM (quais módulos priorizar).
-2. Configure o monorepo (pnpm workspace + Turborepo).
-3. Crie os tsconfigs e eslint configs compartilhados.
-4. Monte o schema Prisma com as entidades core.
-5. Scaffold do NestJS com o primeiro módulo (`CustomerModule`).
-6. Scaffold do Next.js com shadcn/ui.
-7. Primeira feature end-to-end: CRUD de Customer.
-8. Testes dessa feature.
-9. Itere para as próximas features.
+1. **Defina escopo:** Pergunte quais módulos CRM priorizar (Customer, Deal, Activity, etc).
+2. **Scaffold monorepo:** Use `pnpm create turbo@latest` → **explique cada arquivo gerado**.
+3. **Customize tsconfig/eslint:** Baseado em `@crm/config-ts` e `@crm/config-eslint` → use os padrões mas adapte paths aliases.
+4. **Prisma setup:** `pnpm --filter @crm/database add prisma` → monte schema com entidades core.
+5. **NestJS scaffold:** `nest new @crm/api` → **explique módulos, dependency injection, pipes, guards**.
+6. **Next.js scaffold:** `create-next-app@latest @crm/web` → configure shadcn/ui com `npx shadcn-ui@latest init`.
+7. **Primeira feature E2E:** CRUD de Customer (Domain → Use Case → Repository → Controller → Frontend).
+8. **Testes:** Configure Vitest (backend) + Cypress (frontend) → teste a feature.
+9. **Itere:** Valide com usuário, próxima feature.
+
+### Princípio de Design
+- **Scaffolding acelera** setup inicial (poupação de 80% do tempo boilerplate).
+- **Explicação profunda** garante aprendizado (o usuário entende por que cada camada existe).
+- **Customização incremental** evita over-engineering (adicione apenas o que for necessário).
 
 **Sempre valide cada etapa com o usuário antes de avançar.**
